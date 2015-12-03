@@ -33,7 +33,7 @@
     value="{{ item.value }}"
     backup=yes
   with_items: php_fpm_ini
-  notify: 
+  notify:
    - restart php-fpm
   tags: [configuration,php,fpm]
 
@@ -51,9 +51,17 @@
     backup=yes
   with_items: php_fpm_config
   register: copy_fpm_config
-  notify: 
+  notify:
    - restart php-fpm
   tags: [configuration,php,fpm]
+
+- name: Enable modules
+  shell: php5enmod {{ item }}
+  with_items: php_fpm_mods_enabled
+
+- name: Disable modules
+  shell: php5dismod {{ item }}
+  with_items: php_fpm_mods_disabled
 
 - name: Delete the include line from the ini file
   ini_file: >
@@ -94,7 +102,7 @@
     backup=yes
   with_items: php_fpm_pools
   when: php_fpm_pools|lower != 'none'
-  notify: 
+  notify:
    - restart php-fpm
   tags: [configuration,php,fpm]
 
